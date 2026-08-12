@@ -2,7 +2,7 @@ import { Lightbulb, Sparkles, TrendingUp } from "lucide-react";
 
 export interface ExplanationPanelProps {
   formula: string;
-  blurb?: string;
+  blurb?: string | undefined;
   shape: string[];
   meaning: string[];
   change: string | null;

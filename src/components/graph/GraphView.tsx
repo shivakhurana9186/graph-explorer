@@ -18,8 +18,8 @@ export interface GraphViewProps {
   comparePoints?: Pt[] | null;
   xLabel: string;
   yLabel: string;
-  xUnit?: string;
-  yUnit?: string;
+  xUnit?: string | undefined;
+  yUnit?: string | undefined;
   cursor?: Pt | null;
   onHover?: (p: Pt | null) => void;
   animatedPoint?: Pt | null;
