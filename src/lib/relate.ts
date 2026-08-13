@@ -183,9 +183,9 @@ export function relate(aRaw: string, bRaw: string): GraphModule | null {
     topic: multi ? "Derived link" : first.topic,
     expr: composed,
     xLabel: first.xLabel,
-    xUnit: first.xUnit,
+    ...(first.xUnit ? { xUnit: first.xUnit } : {}),
     yLabel: last.yLabel,
-    yUnit: last.yUnit,
+    ...(last.yUnit ? { yUnit: last.yUnit } : {}),
     formula: chain.map((c) => c.mod.formula).join("   →   "),
     blurb: multi
       ? `These two are linked indirectly, through ${chain
@@ -194,9 +194,9 @@ export function relate(aRaw: string, bRaw: string): GraphModule | null {
           .join(" and ")}. The equations below were chained together, so moving any variable flows all the way through.`
       : first.blurb,
     variables,
-    xMin: first.xMin,
-    xMax: first.xMax,
-    meaning: multi ? undefined : first.meaning,
+    ...(first.xMin ? { xMin: first.xMin } : {}),
+    ...(first.xMax ? { xMax: first.xMax } : {}),
+    ...(!multi && first.meaning ? { meaning: first.meaning } : {}),
   };
 }
 
