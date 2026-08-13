@@ -117,9 +117,7 @@ function Index() {
   }, [dark]);
 
   // ---- switching modules ----
-  const pickModule = useCallback((id: string) => {
-    const m = getModule(id);
-    setModId(m.id);
+  const loadModule = useCallback((m: GraphModule) => {
     setCustomOn(false);
     const d = defaultsFor(m);
     setValues(d);
@@ -128,6 +126,26 @@ function Index() {
     setUnit(m.units?.[0]?.options[0]?.name ?? null);
     setXRange([evalRange(m.xMin, d, 0), evalRange(m.xMax, d, 10)]);
   }, []);
+
+  const pickModule = useCallback(
+    (id: string) => {
+      const m = getModule(id);
+      setDerived(null);
+      setModId(m.id);
+      loadModule(m);
+    },
+    [loadModule],
+  );
+
+  const pickDerived = useCallback(
+    (m: GraphModule) => {
+      setDerived(m);
+      loadModule(m);
+    },
+    [loadModule],
+  );
+
+
 
   const onChange = useCallback((key: string, value: number) => {
     setValues((prev) => {
