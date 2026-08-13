@@ -133,6 +133,7 @@ function substituteX(expr: string, inner: string): string {
 }
 
 function pretty(label: string): string {
+  if (label === "ph") return "pH";
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
