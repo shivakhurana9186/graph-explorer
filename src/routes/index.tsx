@@ -320,7 +320,7 @@ function Index() {
                         key={m.id}
                         onClick={() => pickModule(m.id)}
                         className={`w-full rounded-lg px-2.5 py-1.5 text-left text-sm transition-colors ${
-                          m.id === modId && !customOn
+                          m.id === modId && !customOn && !derived
                             ? "bg-primary text-primary-foreground"
                             : "hover:bg-muted text-foreground"
                         }`}
