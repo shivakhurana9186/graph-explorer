@@ -9,6 +9,7 @@ import { GraphView } from "@/components/graph/GraphView";
 import { ControlPanel } from "@/components/graph/ControlPanel";
 import { ExplanationPanel } from "@/components/graph/ExplanationPanel";
 import { MODULES, QUANTITY_ALIASES, TOPICS, getModule, type GraphModule } from "@/lib/modules";
+import { parsePair, relate } from "@/lib/relate";
 import { compile } from "@/lib/expression";
 import { analyze, buildExplanation, samplePoints, toPolar, type Pt } from "@/lib/analysis";
 
