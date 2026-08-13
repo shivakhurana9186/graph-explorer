@@ -9,6 +9,7 @@ import { GraphView } from "@/components/graph/GraphView";
 import { ControlPanel } from "@/components/graph/ControlPanel";
 import { ExplanationPanel } from "@/components/graph/ExplanationPanel";
 import { MODULES, QUANTITY_ALIASES, TOPICS, getModule, type GraphModule } from "@/lib/modules";
+import { parsePair, relate } from "@/lib/relate";
 import { compile } from "@/lib/expression";
 import { analyze, buildExplanation, samplePoints, toPolar, type Pt } from "@/lib/analysis";
 
@@ -68,7 +69,8 @@ function searchModules(q: string): GraphModule[] {
 
 function Index() {
   const [modId, setModId] = useState("v-t");
-  const mod = getModule(modId);
+  const [derived, setDerived] = useState<GraphModule | null>(null);
+  const mod = derived ?? getModule(modId);
   const [values, setValues] = useState<Record<string, number>>(() => defaultsFor(getModule("v-t")));
   const [xRange, setXRange] = useState<[number, number]>([0, 10]);
   const [query, setQuery] = useState("");
@@ -116,9 +118,7 @@ function Index() {
   }, [dark]);
 
   // ---- switching modules ----
-  const pickModule = useCallback((id: string) => {
-    const m = getModule(id);
-    setModId(m.id);
+  const loadModule = useCallback((m: GraphModule) => {
     setCustomOn(false);
     const d = defaultsFor(m);
     setValues(d);
@@ -127,6 +127,26 @@ function Index() {
     setUnit(m.units?.[0]?.options[0]?.name ?? null);
     setXRange([evalRange(m.xMin, d, 0), evalRange(m.xMax, d, 10)]);
   }, []);
+
+  const pickModule = useCallback(
+    (id: string) => {
+      const m = getModule(id);
+      setDerived(null);
+      setModId(m.id);
+      loadModule(m);
+    },
+    [loadModule],
+  );
+
+  const pickDerived = useCallback(
+    (m: GraphModule) => {
+      setDerived(m);
+      loadModule(m);
+    },
+    [loadModule],
+  );
+
+
 
   const onChange = useCallback((key: string, value: number) => {
     setValues((prev) => {
@@ -222,6 +242,9 @@ function Index() {
   }, [mod, values, xRange, customOn, customExpr, dark]);
 
   const results = useMemo(() => searchModules(query), [query]);
+  const pair = useMemo(() => parsePair(query), [query]);
+  const pairAsked = pair !== null;
+  const pairResult = useMemo(() => (pair ? relate(pair[0], pair[1]) : null), [pair]);
   const grouped = useMemo(
     () => TOPICS.map((t) => ({ topic: t, items: results.filter((m) => m.topic === t) })).filter((g) => g.items.length),
     [results],
@@ -258,16 +281,36 @@ function Index() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search: velocity, pressure, force…"
+                placeholder="Try: force vs time, pH vs volume…"
                 className="pl-9"
               />
             </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Name any two quantities (“energy and time”) — if they're linked, even through other quantities, the
+              equations get chained and plotted.
+            </p>
+            {pairResult && (
+              <button
+                onClick={() => pickDerived(pairResult)}
+                className="mt-3 w-full rounded-xl border border-primary/40 bg-primary/10 p-3 text-left transition-colors hover:bg-primary/15"
+              >
+                <p className="text-sm font-semibold text-foreground">Plot {pairResult.name}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{pairResult.formula}</p>
+              </button>
+            )}
+            {pairAsked && !pairResult && (
+              <p className="mt-3 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+                No chain of equations connects those two yet. Try quantities like time, velocity, force, pressure,
+                temperature, current or concentration.
+              </p>
+            )}
             <div className="mt-3 max-h-[280px] space-y-3 overflow-y-auto pr-1">
-              {grouped.length === 0 && (
+              {grouped.length === 0 && !pairResult && (
                 <p className="text-sm text-muted-foreground">
                   No stored relationship matches that. Try the custom equation box below.
                 </p>
               )}
+
               {grouped.map((g) => (
                 <div key={g.topic}>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{g.topic}</p>
@@ -277,7 +320,7 @@ function Index() {
                         key={m.id}
                         onClick={() => pickModule(m.id)}
                         className={`w-full rounded-lg px-2.5 py-1.5 text-left text-sm transition-colors ${
-                          m.id === modId && !customOn
+                          m.id === modId && !customOn && !derived
                             ? "bg-primary text-primary-foreground"
                             : "hover:bg-muted text-foreground"
                         }`}
