@@ -241,6 +241,9 @@ function Index() {
   }, [mod, values, xRange, customOn, customExpr, dark]);
 
   const results = useMemo(() => searchModules(query), [query]);
+  const pair = useMemo(() => parsePair(query), [query]);
+  const pairAsked = pair !== null;
+  const pairResult = useMemo(() => (pair ? relate(pair[0], pair[1]) : null), [pair]);
   const grouped = useMemo(
     () => TOPICS.map((t) => ({ topic: t, items: results.filter((m) => m.topic === t) })).filter((g) => g.items.length),
     [results],
