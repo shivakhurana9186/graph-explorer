@@ -68,7 +68,8 @@ function searchModules(q: string): GraphModule[] {
 
 function Index() {
   const [modId, setModId] = useState("v-t");
-  const mod = getModule(modId);
+  const [derived, setDerived] = useState<GraphModule | null>(null);
+  const mod = derived ?? getModule(modId);
   const [values, setValues] = useState<Record<string, number>>(() => defaultsFor(getModule("v-t")));
   const [xRange, setXRange] = useState<[number, number]>([0, 10]);
   const [query, setQuery] = useState("");
