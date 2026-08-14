@@ -597,10 +597,42 @@ export const MODULES: GraphModule[] = [
     meaning: { slope: "The flat middle is the buffer region; the steep part is the equivalence point." },
   },
 
+  {
+    id: "raoult-total",
+    name: "Total vapour pressure vs Mole fraction of solute (Raoult's law)",
+    topic: "Chemistry",
+    expr: "P0*(1 - x)",
+    xLabel: "Mole fraction of solute",
+    yLabel: "Total vapour pressure",
+    yUnit: "mm Hg",
+    formula: "P = P° · (1 − x_solute)",
+    blurb:
+      "A non-volatile solute contributes no vapour of its own, so the total pressure is just the solvent's pressure, lowered in proportion to how much solute you dissolve.",
+    derivation: [
+      "Raoult's law for each component: the partial pressure of a component equals its pure vapour pressure times its mole fraction in the liquid — P_A = P°_A · x_A.",
+      "The solute is non-volatile, so its own vapour pressure P°_B = 0 and therefore its partial pressure P_B = 0.",
+      "Total pressure is the sum of the partial pressures: P_total = P_A + P_B = P°_solvent · x_solvent + 0.",
+      "Mole fractions add to one: x_solvent = 1 − x_solute.",
+      "Substituting gives P_total = P° · (1 − x_solute) — a straight line falling from P° at x = 0 to zero at x = 1.",
+      "Rearranged, (P° − P)/P° = x_solute: the relative lowering of vapour pressure equals the mole fraction of solute (a colligative property).",
+    ],
+    variables: [
+      { key: "P0", label: "Pure solvent vapour pressure P°", unit: "mm Hg", min: 10, max: 800, step: 5, default: 760, note: "The y-intercept of the line." },
+    ],
+    xMin: "0",
+    xMax: "1",
+    meaning: {
+      slope: "The slope is −P°: every extra bit of solute lowers the pressure by the same amount.",
+      intercept: "At x = 0 (pure solvent) the pressure is P° itself.",
+    },
+    keywords: ["raoult", "mole fraction", "vapour pressure", "colligative", "solution", "non-volatile"],
+  },
+
   // ---------------- Math ----------------
   {
     id: "custom",
     name: "Custom function y = f(x)",
+
     topic: "Math functions",
     expr: "a*sin(b*x) + c",
     xLabel: "x",
