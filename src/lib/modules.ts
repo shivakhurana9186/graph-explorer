@@ -34,6 +34,9 @@ export interface GraphModule {
   yUnit?: string;
   formula: string;
   blurb: string;
+  /** step-by-step story of where the equation comes from */
+  derivation?: string[];
+
   variables: VarDef[];
   xMin?: string; // expression (may use variables)
   xMax?: string;
